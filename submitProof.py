@@ -163,7 +163,21 @@ def get_account():
     return eth_account.Account.from_key(sk)
 
 def get_contract_info(chain):
-    contract_file = Path(__file__).parent.absolute() / "contract_info.json"
+    """
+    Returns a contract address and contract abi from "contract_info.json"
+    """
+    # Try the current directory first
+    cur_dir = Path(__file__).parent.absolute()
+    contract_file = cur_dir / "contract_info.json"
+    
+    # If not found, check the parent directory (common in Codio/GitHub clones)
+    if not contract_file.is_file():
+        contract_file = cur_dir.parent / "contract_info.json"
+        
+    # If still not found, check the specific path from your error message
+    if not contract_file.is_file():
+        contract_file = Path('/home/codio/workspace/.guides/student_code/Merkle-Trees/contract_info.json')
+
     with open(contract_file, "r") as f:
         d = json.load(f)
         d = d[chain]
@@ -176,6 +190,5 @@ def sign_challenge_verify(challenge, addr, sig):
         return True
     return False
 
-# Ensure this is at the very bottom of your file to trigger the execution
 if __name__ == "__main__":
     merkle_assignment()
