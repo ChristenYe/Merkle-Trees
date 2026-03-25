@@ -136,3 +136,10 @@ def send_signed_msg(proof, random_leaf):
     tx_hash = w3.eth.send_raw_transaction(signed_tx.raw_transaction)
     
     return tx_hash.hex()
+
+def hash_pair(a, b):
+    # This must be present in your environment!
+    if a < b:
+        return Web3.solidity_keccak(['bytes32', 'bytes32'], [a, b])
+    else:
+        return Web3.solidity_keccak(['bytes32', 'bytes32'], [b, a])
