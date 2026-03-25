@@ -142,3 +142,40 @@ def hash_pair(a, b):
         return Web3.solidity_keccak(['bytes32', 'bytes32'], [a, b])
     else:
         return Web3.solidity_keccak(['bytes32', 'bytes32'], [b, a])
+
+def connect_to(chain):
+    if chain not in ['avax','bsc']:
+        return None
+    if chain == 'avax':
+        api_url = f"https://api.avax-test.network/ext/bc/C/rpc"
+    else:
+        api_url = f"https://data-seed-prebsc-1-s1.binance.org:8545/"
+    w3 = Web3(Web3.HTTPProvider(api_url))
+    w3.middleware_onion.inject(ExtraDataToPOAMiddleware, layer=0)
+    return w3
+
+def get_account():
+    cur_dir = Path(__file__).parent.absolute()
+    with open(cur_dir.joinpath('sk.txt'), 'r') as f:
+        sk = f.readline().rstrip()
+    if sk[0:2] == "0x":
+        sk = sk[2:]
+    return eth_account.Account.from_key(sk)
+
+def get_contract_info(chain):
+    contract_file = Path(__file__).parent.absolute() / "contract_info.json"
+    with open(contract_file, "r") as f:
+        d = json.load(f)
+        d = d[chain]
+    return d['address'], d['abi']
+
+def sign_challenge_verify(challenge, addr, sig):
+    eth_encoded_msg = eth_account.messages.encode_defunct(text=challenge)
+    if eth_account.Account.recover_message(eth_encoded_msg, signature=sig) == addr:
+        print(f"Success: signed the challenge {challenge} using address {addr}!")
+        return True
+    return False
+
+# Ensure this is at the very bottom of your file to trigger the execution
+if __name__ == "__main__":
+    merkle_assignment()
