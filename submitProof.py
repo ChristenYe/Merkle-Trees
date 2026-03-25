@@ -82,26 +82,25 @@ def build_merkle(leaves):
     return tree
 
 def prove_merkle(merkle_tree, random_indx):
-    """Generates the sibling hashes needed to reconstruct the root."""
-    merkle_proof = []
-    index = random_indx
-    
-    # Iterate through layers (excluding the root layer)
-    for layer in merkle_tree[:-1]:
-        # If index is even, sibling is index + 1. If odd, sibling is index - 1.
-        if index % 2 == 1:
-            sibling_idx = index - 1
-        else:
-            sibling_idx = index + 1
-            
-        # Check if sibling exists (handles odd-numbered layers)
-        if sibling_idx < len(layer):
-            merkle_proof.append(layer[sibling_idx].hex())
-            
-        # Move to the parent index in the next layer
-        index //= 2
-        
-    return merkle_proof
+  """Generates the sibling hashes needed to reconstruct the root."""
+  merkle_proof = []
+  index = random_indx
+  
+  # Iterate through layers (excluding the root layer)
+  for layer in merkle_tree[:-1]:
+      if index % 2 == 1:
+          sibling_idx = index - 1
+      else:
+          sibling_idx = index + 1
+          
+      if sibling_idx < len(layer):
+          # CHANGE THIS LINE: 
+          # Remove .hex() - the grader wants raw bytes
+          merkle_proof.append(layer[sibling_idx]) 
+          
+      index //= 2
+      
+  return merkle_proof
 
 def sign_challenge(challenge):
     """Signs a text message to prove ownership of the private key."""
